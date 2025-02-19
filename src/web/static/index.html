@@ -5,16 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .task { margin: 10px 0; }
-        .completed { text-decoration: line-through; }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .task {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .task.completed span {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .task button {
+            background-color: #ff4d4d;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .task button:hover {
+            background-color: #ff1a1a;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button.add-task {
+            width: 100%;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button.add-task:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
-    <h1>To-Do List</h1>
-    <div id="tasks"></div>
-    <input type="text" id="taskDescription" placeholder="New task">
-    <button onclick="addTask()">Add Task</button>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <div id="tasks"></div>
+        <input type="text" id="taskDescription" placeholder="New task">
+        <button class="add-task" onclick="addTask()">Add Task</button>
+    </div>
 
     <script>
         async function fetchTasks() {

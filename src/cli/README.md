@@ -50,7 +50,7 @@ To build and run this application, you need to have Rust installed on your syste
 
 4. **Build the project**: Navigate to the project directory and build the project using Cargo:
     ```sh
-    cd todo-list
+    cd /Users/vsabolotny/Projects/todo-list
     cargo build
     ```
 
@@ -58,13 +58,13 @@ To build and run this application, you need to have Rust installed on your syste
     ```sh
     cargo run
     ```
-    
+
 ## Installation
 
 Clone the repository and navigate to the project directory:
 ```sh
 git clone https://github.com/vsabolotny/todo-list.git
-cd todo-list
+cd /Users/vsabolotny/Projects/todo-list
 ```
 
 Make the script executable:
