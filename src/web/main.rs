@@ -62,6 +62,26 @@ fn add_task(conn: &rocket::State<DbConn>, task: Json<Task>) -> Result<(), MyErro
     Ok(())
 }
 
+#[delete("/tasks/<id>")]
+fn delete_task(conn: &rocket::State<DbConn>, id: i32) -> Result<(), MyError> {
+    let conn = conn.0.lock().unwrap();
+    conn.execute(
+        "DELETE FROM task WHERE id = ?1",
+        params![id],
+    )?;
+    Ok(())
+}
+
+#[put("/tasks/<id>/complete/<completed>")]
+fn mark_task_done(conn: &rocket::State<DbConn>, id: i32, completed: bool) -> Result<(), MyError> {
+    let conn = conn.0.lock().unwrap();
+    conn.execute(
+        "UPDATE task SET completed = ?1 WHERE id = ?2",
+        params![completed as i32, id],
+    )?;
+    Ok(())
+}
+
 #[launch]
 fn rocket() -> _ {
     let conn = Connection::open("tasks.db").unwrap();
@@ -76,6 +96,6 @@ fn rocket() -> _ {
 
     rocket::build()
         .manage(DbConn(Mutex::new(conn)))
-        .mount("/", routes![get_tasks, add_task])
+        .mount("/", routes![get_tasks, add_task, delete_task, mark_task_done])
         .mount("/", FileServer::from(relative!("static")))
 }

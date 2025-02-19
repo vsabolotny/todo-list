@@ -25,7 +25,22 @@
             tasks.forEach(task => {
                 const taskDiv = document.createElement('div');
                 taskDiv.className = 'task' + (task.completed ? ' completed' : '');
-                taskDiv.textContent = task.description;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = task.completed;
+                checkbox.onchange = () => markTaskDone(task.id, checkbox.checked);
+                taskDiv.appendChild(checkbox);
+
+                const taskText = document.createElement('span');
+                taskText.textContent = task.description;
+                taskDiv.appendChild(taskText);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deleteTask(task.id);
+                taskDiv.appendChild(deleteButton);
+
                 tasksDiv.appendChild(taskDiv);
             });
         }
@@ -38,6 +53,20 @@
                 body: JSON.stringify({ description, completed: false })
             });
             document.getElementById('taskDescription').value = '';
+            fetchTasks();
+        }
+
+        async function deleteTask(id) {
+            await fetch(`/tasks/${id}`, {
+                method: 'DELETE'
+            });
+            fetchTasks();
+        }
+
+        async function markTaskDone(id, completed) {
+            await fetch(`/tasks/${id}/complete/${completed}`, {
+                method: 'PUT'
+            });
             fetchTasks();
         }
 
