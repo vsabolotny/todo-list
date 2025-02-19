@@ -55,7 +55,7 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-        button.add-task {
+        button.add-task, button.toggle-completed {
             width: 100%;
             background-color: #4CAF50;
             border: none;
@@ -63,8 +63,9 @@
             padding: 10px;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 10px;
         }
-        button.add-task:hover {
+        button.add-task:hover, button.toggle-completed:hover {
             background-color: #45a049;
         }
     </style>
@@ -73,17 +74,24 @@
     <div class="container">
         <h1>To-Do List</h1>
         <div id="tasks"></div>
-        <input type="text" id="taskDescription" placeholder="New task">
+        <input type="text" id="taskDescription" placeholder="New task" onkeypress="handleKeyPress(event)">
         <button class="add-task" onclick="addTask()">Add Task</button>
+        <button class="toggle-completed" onclick="toggleCompletedTasks()">Hide Completed Tasks</button>
     </div>
 
     <script>
+        let showCompletedTasks = true;
+
         async function fetchTasks() {
             const response = await fetch('/tasks');
             const tasks = await response.json();
             const tasksDiv = document.getElementById('tasks');
             tasksDiv.innerHTML = '';
             tasks.forEach(task => {
+                if (!showCompletedTasks && task.completed) {
+                    return;
+                }
+
                 const taskDiv = document.createElement('div');
                 taskDiv.className = 'task' + (task.completed ? ' completed' : '');
 
@@ -95,6 +103,7 @@
 
                 const taskText = document.createElement('span');
                 taskText.textContent = task.description;
+                taskText.onclick = () => markTaskDone(task.id, !task.completed);
                 taskDiv.appendChild(taskText);
 
                 const deleteButton = document.createElement('button');
@@ -128,6 +137,18 @@
             await fetch(`/tasks/${id}/complete/${completed}`, {
                 method: 'PUT'
             });
+            fetchTasks();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addTask();
+            }
+        }
+
+        function toggleCompletedTasks() {
+            showCompletedTasks = !showCompletedTasks;
+            document.querySelector('.toggle-completed').textContent = showCompletedTasks ? 'Hide Completed Tasks' : 'Show Completed Tasks';
             fetchTasks();
         }
 

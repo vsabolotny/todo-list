@@ -6,7 +6,6 @@ use rocket::response::status::Custom;
 use rocket::http::Status;
 use rusqlite::{params, Connection, Result};
 use std::sync::Mutex;
-use std::io;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Task {
@@ -25,7 +24,10 @@ enum MyError {
 impl<'r> rocket::response::Responder<'r, 'static> for MyError {
     fn respond_to(self, request: &'r rocket::Request<'_>) -> rocket::response::Result<'static> {
         match self {
-            MyError::DatabaseError(_) => Custom(Status::InternalServerError, "Database error").respond_to(request),
+            MyError::DatabaseError(err) => {
+                let error_message = format!("Database error: {}", err);
+                Custom(Status::InternalServerError, error_message).respond_to(request)
+            }
         }
     }
 }

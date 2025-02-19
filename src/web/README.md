@@ -12,6 +12,7 @@ This is a simple To-Do List web application built with Rust using the Rocket web
 - View all tasks
 - Mark tasks as completed or incomplete
 - Delete tasks
+- Hide and show completed tasks
 
 ## Prerequisites
 
