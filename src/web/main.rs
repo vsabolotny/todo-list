@@ -1,12 +1,14 @@
 #[macro_use] extern crate rocket;
 
 use rocket::fs::{FileServer, relative};
-use rocket::serde::{Serialize, json::Json};
+use rocket::serde::{Serialize, Deserialize, json::Json};
+use rocket::response::status::Custom;
+use rocket::http::Status;
 use rusqlite::{params, Connection, Result};
 use std::sync::Mutex;
 use std::io;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Task {
     id: Option<i32>,
     description: String,
@@ -15,24 +17,43 @@ struct Task {
 
 struct DbConn(Mutex<Connection>);
 
+#[derive(Debug)]
+enum MyError {
+    DatabaseError(rusqlite::Error),
+}
+
+impl<'r> rocket::response::Responder<'r, 'static> for MyError {
+    fn respond_to(self, request: &'r rocket::Request<'_>) -> rocket::response::Result<'static> {
+        match self {
+            MyError::DatabaseError(_) => Custom(Status::InternalServerError, "Database error").respond_to(request),
+        }
+    }
+}
+
+impl From<rusqlite::Error> for MyError {
+    fn from(err: rusqlite::Error) -> MyError {
+        MyError::DatabaseError(err)
+    }
+}
+
 #[get("/tasks")]
-fn get_tasks(conn: &rocket::State<DbConn>) -> Json<Vec<Task>> {
+fn get_tasks(conn: &rocket::State<DbConn>) -> Result<Json<Vec<Task>>, MyError> {
     let conn = conn.0.lock().unwrap();
-    let mut stmt = conn.prepare("SELECT id, description, completed FROM task").unwrap();
+    let mut stmt = conn.prepare("SELECT id, description, completed FROM task")?;
     let task_iter = stmt.query_map([], |row| {
         Ok(Task {
             id: row.get(0)?,
             description: row.get(1)?,
             completed: row.get(2)?,
         })
-    }).unwrap();
+    })?;
 
     let tasks: Vec<Task> = task_iter.map(|task| task.unwrap()).collect();
-    Json(tasks)
+    Ok(Json(tasks))
 }
 
 #[post("/tasks", format = "json", data = "<task>")]
-fn add_task(conn: &rocket::State<DbConn>, task: Json<Task>) -> Result<()> {
+fn add_task(conn: &rocket::State<DbConn>, task: Json<Task>) -> Result<(), MyError> {
     let conn = conn.0.lock().unwrap();
     conn.execute(
         "INSERT INTO task (description, completed) VALUES (?1, ?2)",
