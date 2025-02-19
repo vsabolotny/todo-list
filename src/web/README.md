@@ -43,6 +43,4 @@ This is a simple To-Do List web application built with Rust using the Rocket web
 2. Open your browser and navigate to `http://127.0.0.1:8000/`.
 
 ## To implement next 
-- Edit existing tasks
-- Delete tasks
-- Mark tasks as completed
+- Log of what has been done
