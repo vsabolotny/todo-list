@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .task { margin: 10px 0; }
+        .completed { text-decoration: line-through; }
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <div id="tasks"></div>
+    <input type="text" id="taskDescription" placeholder="New task">
+    <button onclick="addTask()">Add Task</button>
+
+    <script>
+        async function fetchTasks() {
+            const response = await fetch('/tasks');
+            const tasks = await response.json();
+            const tasksDiv = document.getElementById('tasks');
+            tasksDiv.innerHTML = '';
+            tasks.forEach(task => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = 'task' + (task.completed ? ' completed' : '');
+                taskDiv.textContent = task.description;
+                tasksDiv.appendChild(taskDiv);
+            });
+        }
+
+        async function addTask() {
+            const description = document.getElementById('taskDescription').value;
+            await fetch('/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ description, completed: false })
+            });
+            document.getElementById('taskDescription').value = '';
+            fetchTasks();
+        }
+
+        fetchTasks();
+    </script>
+</body>
+</html>

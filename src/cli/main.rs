@@ -1,5 +1,5 @@
 use rusqlite::{params, Connection, Result};
-use todo_list::greet;
+// use todo_list::greet;
 use std::io;
 
 #[derive(Debug)]
@@ -21,7 +21,7 @@ fn main() -> Result<()> {
         [],
     )?;
 
-    greet();
+    // greet();
 
     loop {
         println!("To-Do List:");

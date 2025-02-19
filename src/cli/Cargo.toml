@@ -1,0 +1,11 @@
+[package]
+name = "todo-list-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rusqlite = "0.26.3"
+
+[[bin]]
+name = "todo-list-cli"
+path = "main.rs"

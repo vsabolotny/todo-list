@@ -1,5 +1,9 @@
-/target
-Cargo.lock
-tasks.db
-*.log
-*.tmp
+# cli
+src/cli/target
+src/cli/Cargo.lock
+src/cli/tasks.db
+
+# web
+src/web/target
+src/web/Cargo.lock
+src/web/tasks.db
