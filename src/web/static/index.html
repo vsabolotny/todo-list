@@ -20,6 +20,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
+            position: relative;
         }
         h1 {
             text-align: center;
@@ -55,7 +56,7 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-        button.add-task, button.toggle-completed, button.delete-all-tasks, button.delete-all-logs {
+        button.add-task, button.delete-all-tasks, button.delete-all-logs {
             width: 100%;
             background-color: #4CAF50;
             border: none;
@@ -65,7 +66,7 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        button.add-task:hover, button.toggle-completed:hover, button.delete-all-tasks:hover, button.delete-all-logs:hover {
+        button.add-task:hover, button.delete-all-tasks:hover, button.delete-all-logs:hover {
             background-color: #45a049;
         }
         .log {
@@ -80,6 +81,22 @@
         .log-entry {
             margin: 5px 0;
         }
+        .toggle-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+        .toggle-icon.show {
+            background: url('toggle-icon-on.png') no-repeat center center;
+            background-size: contain;
+        }
+        .toggle-icon.hide {
+            background: url('toggle-icon-off.png') no-repeat center center;
+            background-size: contain;
+        }
     </style>
 </head>
 <body>
@@ -88,10 +105,10 @@
         <div id="tasks"></div>
         <input type="text" id="taskDescription" placeholder="New task" onkeypress="handleKeyPress(event)">
         <button class="add-task" onclick="addTask()">Add Task</button>
-        <button class="toggle-completed" onclick="toggleCompletedTasks()">Hide Completed Tasks</button>
         <button class="delete-all-tasks" onclick="deleteAllTasks()">Delete All Tasks</button>
         <button class="delete-all-logs" onclick="deleteAllLogs()">Delete All Logs</button>
         <div class="log" id="log"></div>
+        <div class="toggle-icon show" onclick="toggleCompletedTasks()"></div>
     </div>
 
     <script>
@@ -145,6 +162,9 @@
 
         async function addTask() {
             const description = document.getElementById('taskDescription').value;
+            if (description.trim() === "") {
+                return;
+            }
             await fetch('/tasks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -194,7 +214,9 @@
 
         function toggleCompletedTasks() {
             showCompletedTasks = !showCompletedTasks;
-            document.querySelector('.toggle-completed').textContent = showCompletedTasks ? 'Hide Completed Tasks' : 'Show Completed Tasks';
+            const toggleIcon = document.querySelector('.toggle-icon');
+            toggleIcon.classList.toggle('show', showCompletedTasks);
+            toggleIcon.classList.toggle('hide', !showCompletedTasks);
             fetchTasks();
         }
 

@@ -64,6 +64,9 @@ fn get_tasks(conn: &rocket::State<DbConn>) -> Result<Json<Vec<Task>>, MyError> {
 
 #[post("/tasks", format = "json", data = "<task>")]
 fn add_task(conn: &rocket::State<DbConn>, task: Json<Task>) -> Result<(), MyError> {
+    if task.description.trim().is_empty() {
+        return Ok(());
+    }
     let conn = conn.0.lock().unwrap();
     conn.execute(
         "INSERT INTO task (description, completed) VALUES (?1, ?2)",
@@ -123,7 +126,6 @@ fn get_logs(conn: &rocket::State<DbConn>) -> Result<Json<Vec<LogEntry>>, MyError
 fn delete_all_logs(conn: &rocket::State<DbConn>) -> Result<(), MyError> {
     let conn = conn.0.lock().unwrap();
     conn.execute("DELETE FROM log", [])?;
-    add_log_entry(&conn, "Deleted all logs".to_string())?;
     Ok(())
 }
 
