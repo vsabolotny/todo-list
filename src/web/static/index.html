@@ -68,6 +68,18 @@
         button.add-task:hover, button.toggle-completed:hover {
             background-color: #45a049;
         }
+        .log {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -77,6 +89,7 @@
         <input type="text" id="taskDescription" placeholder="New task" onkeypress="handleKeyPress(event)">
         <button class="add-task" onclick="addTask()">Add Task</button>
         <button class="toggle-completed" onclick="toggleCompletedTasks()">Hide Completed Tasks</button>
+        <div class="log" id="log"></div>
     </div>
 
     <script>
@@ -115,6 +128,19 @@
             });
         }
 
+        async function fetchLogs() {
+            const response = await fetch('/logs');
+            const logs = await response.json();
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML = '';
+            logs.forEach(log => {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.textContent = `${log.timestamp}: ${log.action}`;
+                logDiv.appendChild(logEntry);
+            });
+        }
+
         async function addTask() {
             const description = document.getElementById('taskDescription').value;
             await fetch('/tasks', {
@@ -124,6 +150,7 @@
             });
             document.getElementById('taskDescription').value = '';
             fetchTasks();
+            fetchLogs();
         }
 
         async function deleteTask(id) {
@@ -131,6 +158,7 @@
                 method: 'DELETE'
             });
             fetchTasks();
+            fetchLogs();
         }
 
         async function markTaskDone(id, completed) {
@@ -138,6 +166,7 @@
                 method: 'PUT'
             });
             fetchTasks();
+            fetchLogs();
         }
 
         function handleKeyPress(event) {
@@ -153,6 +182,7 @@
         }
 
         fetchTasks();
+        fetchLogs();
     </script>
 </body>
 </html>

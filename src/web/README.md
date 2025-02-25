@@ -44,3 +44,4 @@ This is a simple To-Do List web application built with Rust using the Rocket web
 
 ## To implement next 
 - Log of what has been done
+- dioxus for html dynamic generation 
