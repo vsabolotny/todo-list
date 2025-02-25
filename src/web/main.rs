@@ -84,6 +84,14 @@ fn delete_task(conn: &rocket::State<DbConn>, id: i32) -> Result<(), MyError> {
     Ok(())
 }
 
+#[delete("/tasks")]
+fn delete_all_tasks(conn: &rocket::State<DbConn>) -> Result<(), MyError> {
+    let conn = conn.0.lock().unwrap();
+    conn.execute("DELETE FROM task", [])?;
+    add_log_entry(&conn, "Deleted all tasks".to_string())?;
+    Ok(())
+}
+
 #[put("/tasks/<id>/complete/<completed>")]
 fn mark_task_done(conn: &rocket::State<DbConn>, id: i32, completed: bool) -> Result<(), MyError> {
     let conn = conn.0.lock().unwrap();
@@ -109,6 +117,14 @@ fn get_logs(conn: &rocket::State<DbConn>) -> Result<Json<Vec<LogEntry>>, MyError
 
     let logs: Vec<LogEntry> = log_iter.map(|log| log.unwrap()).collect();
     Ok(Json(logs))
+}
+
+#[delete("/logs")]
+fn delete_all_logs(conn: &rocket::State<DbConn>) -> Result<(), MyError> {
+    let conn = conn.0.lock().unwrap();
+    conn.execute("DELETE FROM log", [])?;
+    add_log_entry(&conn, "Deleted all logs".to_string())?;
+    Ok(())
 }
 
 fn add_log_entry(conn: &Connection, action: String) -> Result<(), MyError> {
@@ -142,6 +158,6 @@ fn rocket() -> _ {
 
     rocket::build()
         .manage(DbConn(Mutex::new(conn)))
-        .mount("/", routes![get_tasks, add_task, delete_task, mark_task_done, get_logs])
+        .mount("/", routes![get_tasks, add_task, delete_task, delete_all_tasks, mark_task_done, get_logs, delete_all_logs])
         .mount("/", FileServer::from(relative!("static")))
 }

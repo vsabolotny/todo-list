@@ -55,7 +55,7 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-        button.add-task, button.toggle-completed {
+        button.add-task, button.toggle-completed, button.delete-all-tasks, button.delete-all-logs {
             width: 100%;
             background-color: #4CAF50;
             border: none;
@@ -65,7 +65,7 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        button.add-task:hover, button.toggle-completed:hover {
+        button.add-task:hover, button.toggle-completed:hover, button.delete-all-tasks:hover, button.delete-all-logs:hover {
             background-color: #45a049;
         }
         .log {
@@ -89,6 +89,8 @@
         <input type="text" id="taskDescription" placeholder="New task" onkeypress="handleKeyPress(event)">
         <button class="add-task" onclick="addTask()">Add Task</button>
         <button class="toggle-completed" onclick="toggleCompletedTasks()">Hide Completed Tasks</button>
+        <button class="delete-all-tasks" onclick="deleteAllTasks()">Delete All Tasks</button>
+        <button class="delete-all-logs" onclick="deleteAllLogs()">Delete All Logs</button>
         <div class="log" id="log"></div>
     </div>
 
@@ -158,6 +160,21 @@
                 method: 'DELETE'
             });
             fetchTasks();
+            fetchLogs();
+        }
+
+        async function deleteAllTasks() {
+            await fetch('/tasks', {
+                method: 'DELETE'
+            });
+            fetchTasks();
+            fetchLogs();
+        }
+
+        async function deleteAllLogs() {
+            await fetch('/logs', {
+                method: 'DELETE'
+            });
             fetchLogs();
         }
 
